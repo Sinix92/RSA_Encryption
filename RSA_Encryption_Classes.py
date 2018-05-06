@@ -141,6 +141,23 @@ class RSAMethods:
 
     @staticmethod
     def initialize_keys(nb_figures_prime_numbers, start_e_nb, end_e_nb, step_e_nb, start_k_nb, end_k_nb):
+
+        '''
+        :param nb_figures_prime_numbers: If 2, then the method will yield 2-digit prime numbers
+        :param start_e_nb: e will be randomly drawn from a list beginning with this parameter
+        :param end_e_nb: e will be randomly drawn from a list ending with this parameter
+        :param step_e_nb: the step between each element in the list of possible 'e'
+        :param start_k_nb: k will be randomly drawn from a list beginning with this parameter
+        :param end_k_nb: k will be randomly drawn from a list ending with this parameter
+        :return: returns the public keys e, n and the private key d
+
+        Watch out:
+        n has to be greater than the message, let's say n is 324, then the ascii message has to be below 324
+        e has to be odd and must not share any common factor with Phi(n)
+        k has to be chosen so that ((k*Phi(n)+1)/e) to be an integer, sometimes it is not possible so we have to chose
+        new parameters (n and e)
+        '''
+
         level_of_dozen = 10 ** (nb_figures_prime_numbers - 1)
         list_prime_numbers = PrimeNumbers(level_of_dozen, (10 * level_of_dozen) - 1).list
 
