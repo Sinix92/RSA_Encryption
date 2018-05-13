@@ -1,6 +1,6 @@
 import random
 
-from Arithmetic_functions import is_prime_number, share_common_factor
+from Arithmetic_functions import is_prime_number, share_common_factor, draw_prime
 from customized_decorators import singleton
 
 
@@ -159,13 +159,30 @@ class RSAMethods:
         '''
 
         level_of_dozen = 10 ** (nb_figures_prime_numbers - 1)
-        list_prime_numbers = PrimeNumbers(level_of_dozen, (10 * level_of_dozen) - 1).list
+        # list_prime_numbers = PrimeNumbers(level_of_dozen, (10 * level_of_dozen)).list
 
         list_k_numbers = []
         while not list_k_numbers:  # sometimes list_k_numbers can be empty, hence the loop here
-            p1 = random.choice(list_prime_numbers)
-            list_prime_numbers.remove(p1)  # p2 must be different from p1, so we remove p1 from the list
-            p2 = random.choice(list_prime_numbers)
+
+            # #####################################################################################
+            # # A way to draw the primes:
+            # # We first build a table of prime numbers (a lot of time and memory) but then we just randomly draw
+            # # prime numbers from the table (very easy)
+            # p1 = random.choice(list_prime_numbers)
+            # list_prime_numbers.remove(p1)  # p2 must be different from p1, so we remove p1 from the list
+            # p2 = random.choice(list_prime_numbers)
+            # #####################################################################################
+
+            #####################################################################################
+            # Another way to draw the primes:
+            # We randomly draw the prime numbers (less time and memory than the way before)
+            # But we need to it twice and make sure that p2 is not equal to p1 (sometimes we need to do again the draw)
+            p1 = draw_prime(min_nb=level_of_dozen, max_nb=(10 * level_of_dozen))
+            p2 = p1
+            while p2 == p1:
+                p2 = draw_prime(min_nb=level_of_dozen, max_nb=(10 * level_of_dozen))
+            #####################################################################################
+
             n = p1 * p2
             phi_n = (p1 - 1) * (p2 - 1)
 

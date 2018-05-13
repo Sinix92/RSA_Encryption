@@ -1,3 +1,4 @@
+import random
 import collections
 import matplotlib.pyplot as plt
 
@@ -14,6 +15,19 @@ def is_prime_number(number):
         if number % i == 0:
             return False
     return True
+
+
+# Randomly draw a prime number
+def draw_prime(max_nb, min_nb=2):
+    my_range = range(min_nb, max_nb + 1)
+    my_prime = random.choice(my_range)
+    set_of_drawn_nb = set()
+    while not is_prime_number(my_prime):
+        set_of_drawn_nb.add(my_prime)
+        while my_prime in set_of_drawn_nb:
+            my_prime = random.choice(my_range)
+
+    return my_prime
 
 
 # Sieve of Eratosthenes: to get all the prime numbers from 2 to max_number
