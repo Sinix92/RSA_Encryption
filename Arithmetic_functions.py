@@ -247,4 +247,4 @@ if __name__ == '__main__':
     # print(sieve_of_eratosthenes(100))
     # print(gcd(192, 270))
     # print(fermat_primality_test(32416190071, 20))
-    # print(fermat_primality_test(90071992547409932343, 20))
+    print(fermat_primality_test(9007199254740993234349999, 20))
