@@ -9,7 +9,7 @@ of one or more primes.
 """
 
 
-# Prime Number Function
+# Prime Number Function: Trivial function (not used in the code but to check the results of Primality Test function)
 def is_prime_number(number):
     for i in range(2, int(number ** 0.5) + 1):
         if number % i == 0:
@@ -19,15 +19,38 @@ def is_prime_number(number):
 
 # Randomly draw a prime number
 def draw_prime(max_nb, min_nb=2):
-    my_range = range(min_nb, max_nb + 1)
-    my_prime = random.choice(my_range)
+    my_prime = random.randint(min_nb, max_nb)
     set_of_drawn_nb = set()
-    while not is_prime_number(my_prime):
+    while not fermat_primality_test(my_prime, 20):
         set_of_drawn_nb.add(my_prime)
         while my_prime in set_of_drawn_nb:
-            my_prime = random.choice(my_range)
+            my_prime = random.randint(min_nb, max_nb)
 
     return my_prime
+
+
+# Used in the code to check if the input integer is a Prime number (reduced complexity compared to trivial function)
+def fermat_primality_test(p, nb_tests):
+    # randomly draw an integer a < p
+    a = random.randint(2, p - 1)
+    # find the gcd(a,p) with Euclidean Algorithm
+    greatest_common_divisor = gcd(p, a)
+
+    # if gcd(a,p) != 1 then p is not prime and we need to draw again a and p
+    if greatest_common_divisor != 1:
+        return False
+    # else: we can proceed to the second test
+    else:
+        result_test = fast_modular_exponentiation(a, p - 1, p)
+        # if result test is not 1, then we are sure p is not Prime
+        if result_test != 1:
+            return False
+        # else, as we could have drawn an "a" that is a fool, we are going to test again P with another a, to be sure
+        else:
+            if nb_tests == 1:
+                return True
+            else:
+                return fermat_primality_test(p, nb_tests - 1)
 
 
 # Sieve of Eratosthenes: to get all the prime numbers from 2 to max_number
@@ -138,35 +161,82 @@ def share_common_factor(nb1, nb2):
         return False
 
 
-def test_prime_factorization():
-    my_number = 437231
-    print(find_prime_factorization(my_number, find_prime_factors(my_number)))
+# Euclidean Algorithm: to find the gcd in an easy way
+def gcd(nb1, nb2):
+    if any((nb1, nb2)):
+        nb1 = abs(nb1)
+        nb2 = abs(nb2)
+        if nb1 < nb2:
+            nb1, nb2 = nb2, nb1
+        if nb2 == 0:
+            return nb1
+        else:
+            nb3 = nb1 % nb2
+            return gcd(nb2, nb3)
 
 
-def test_find_remainders_prime_modulo():
-    my_generator = 3
-    my_prime_modulus = 17
-    my_multiplier = 1
-    my_list_of_remainders, my_dict_remainders = find_remainders_prime_modulo(my_generator, my_prime_modulus,
-                                                                             my_prime_modulus * my_multiplier)
-    print(my_list_of_remainders)
-    print(my_dict_remainders)
+# Fast Modular Exponentiation helps in calculating modulo with big numbers: a ** b % c
+def fast_modular_exponentiation(a, b, c):
+    k = -1
+    set_of_results = set()
+    dict_modulo_power_of_two = {}
+    binary_nb = bin(b).split('b')[-1]
+
+    for bit in reversed(binary_nb):
+        k += 1
+        if bit == '1':
+            set_of_results.add(2 ** k)
+
+    modulo_power_of_two(a, 2 ** k, c, dict_modulo_power_of_two)
+
+    product = 1
+    for power in dict_modulo_power_of_two:
+        if power in set_of_results:
+            product *= dict_modulo_power_of_two[power]
+
+    return product % c
 
 
-def test_phi_function():
-    # my_number = 15
-    # print(phi_function(my_number))
+def modulo_power_of_two(a, b, c, dict_results):
+    if b == 1:
+        result = a ** 1 % c
+    else:
+        temp_result = modulo_power_of_two(a, b // 2, c, dict_results)
+        result = (temp_result * temp_result) % c
 
-    y_coordinates = []
-    for n in range(1, 1001):
-        y_coordinates.append(phi_function(n))
+    dict_results[b] = result
+    return result
 
-    plt.scatter(range(1, 1001), y_coordinates, s=1)
-    plt.xlabel('n')
-    plt.ylabel('Phi(n)')
-    plt.ylim([0, 1000])
-    plt.xlim([0, 1000])
-    plt.show()
+
+# def test_prime_factorization():
+#     my_number = 437231
+#     print(find_prime_factorization(my_number, find_prime_factors(my_number)))
+#
+#
+# def test_find_remainders_prime_modulo():
+#     my_generator = 3
+#     my_prime_modulus = 17
+#     my_multiplier = 1
+#     my_list_of_remainders, my_dict_remainders = find_remainders_prime_modulo(my_generator, my_prime_modulus,
+#                                                                              my_prime_modulus * my_multiplier)
+#     print(my_list_of_remainders)
+#     print(my_dict_remainders)
+#
+#
+# def test_phi_function():
+#     # my_number = 15
+#     # print(phi_function(my_number))
+#
+#     y_coordinates = []
+#     for n in range(1, 1001):
+#         y_coordinates.append(phi_function(n))
+#
+#     plt.scatter(range(1, 1001), y_coordinates, s=1)
+#     plt.xlabel('n')
+#     plt.ylabel('Phi(n)')
+#     plt.ylim([0, 1000])
+#     plt.xlim([0, 1000])
+#     plt.show()
 
 
 if __name__ == '__main__':
@@ -174,4 +244,7 @@ if __name__ == '__main__':
     # test_find_remainders_prime_modulo()
     # test_phi_function()
     # share_common_factor(100, 15)
-    print(sieve_of_eratosthenes(100))
+    # print(sieve_of_eratosthenes(100))
+    # print(gcd(192, 270))
+    # print(fermat_primality_test(32416190071, 20))
+    # print(fermat_primality_test(90071992547409932343, 20))
